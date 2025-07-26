@@ -25,7 +25,18 @@ app.use((req, res, next) => {
 });
 
 // Routes
+import indexRoutes from './routes/index.js';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 
+// API routes
+app.use('/api/v1', indexRoutes);
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/chat', chatRoutes);
+
+// 404 handler for undefined routes
 app.use((req, res, next) => {
   next(new AppError({ statusCode: 404, message: 'Route not found' }));
 });
