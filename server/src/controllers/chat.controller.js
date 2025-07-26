@@ -14,19 +14,19 @@ export const sendMessage = async (req, res, next) => {
     }
     
     // Store user message
-    const userMessage = ChatModel.addMessage(userId, {
+    const userMessage = await ChatModel.addMessage(userId, {
       content: message,
       role: 'user'
     });
     
     // Get conversation history
-    const conversationHistory = ChatModel.getConversationHistory(userId);
+    const conversationHistory = await ChatModel.getConversationHistory(userId);
     
     // Generate response from LLM
     const llmResponse = await LLMService.generateResponse(message, conversationHistory);
     
     // Store assistant response
-    const assistantMessage = ChatModel.addMessage(userId, llmResponse);
+    const assistantMessage = await ChatModel.addMessage(userId, llmResponse);
     
     appResponse(res, {
       message: 'Message sent successfully',
@@ -41,11 +41,11 @@ export const sendMessage = async (req, res, next) => {
 };
 
 // Get conversation history
-export const getConversationHistory = (req, res, next) => {
+export const getConversationHistory = async (req, res, next) => {
   try {
     const userId = req.user.id;
     
-    const history = ChatModel.getConversationHistory(userId);
+    const history = await ChatModel.getConversationHistory(userId);
     
     appResponse(res, {
       message: 'Conversation history retrieved successfully',

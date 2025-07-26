@@ -15,6 +15,7 @@ const DEFAULT_PORT = process.env.PORT ?? 4040;
 
 // ====== App Config ======
 const appConfig = {
+    MONGO_URI: process.env.MONGO_URI ?? 'mongodb://localhost:27017/acciojob',
     PORT: DEFAULT_PORT,
     NODE_ENV: process.env.NODE_ENV ?? 'production',
     APP_URL: process.env.APP_URL ?? `http://localhost:${DEFAULT_PORT}`,

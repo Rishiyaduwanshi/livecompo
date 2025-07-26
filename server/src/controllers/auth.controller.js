@@ -1,9 +1,24 @@
 import { BadRequestError, UnauthorizedError } from '../utils/appError.js';
 import appResponse from '../utils/appResponse.js';
-import UserModel from '../models/user.model.js';
+import UserModel from '../models/User.js';
+import jwt from 'jsonwebtoken';
+import { config } from '../../config/index.js';
+
+// Generate tokens
+const generateTokens = (userId) => {
+  const accessToken = jwt.sign({ id: userId }, config.JWT_SECRET, {
+    expiresIn: config.JWT_EXPIRY
+  });
+
+  const refreshToken = jwt.sign({ id: userId }, config.JWT_REFRESH_SECRET, {
+    expiresIn: config.JWT_REFRESH_EXPIRY
+  });
+
+  return { accessToken, refreshToken };
+};
 
 // Register a new user
-export const register = (req, res, next) => {
+export const register = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
     
@@ -13,25 +28,36 @@ export const register = (req, res, next) => {
     }
     
     // Check if user already exists
-    const existingUser = UserModel.findByEmail(email);
+    const existingUser = await UserModel.findByEmail(email);
     if (existingUser) {
       throw new BadRequestError('User with this email already exists');
     }
     
     // Create user
-    const user = UserModel.create({
+    const user = await UserModel.create({
       email,
       password,
       name
     });
     
+    // Generate tokens
+    const tokens = generateTokens(user._id);
+    
+    // Update user's refresh token
+    await UserModel.updateRefreshToken(user._id, tokens.refreshToken);
+    
     // Remove password from response
-    const { password: _, ...userWithoutPassword } = user;
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.refreshToken;
     
     appResponse(res, {
       statusCode: 201,
       message: 'User registered successfully',
-      data: userWithoutPassword
+      data: {
+        user: userResponse,
+        ...tokens
+      }
     });
   } catch (error) {
     next(error);
@@ -39,7 +65,7 @@ export const register = (req, res, next) => {
 };
 
 // Login user
-export const login = (req, res, next) => {
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     
@@ -49,25 +75,33 @@ export const login = (req, res, next) => {
     }
     
     // Find user
-    const user = UserModel.findByEmail(email);
+    const user = await UserModel.findByEmail(email);
     if (!user) {
       throw new UnauthorizedError('Invalid credentials');
     }
     
-    // Check password (in a real app, you would compare hashed passwords)
-    if (user.password !== password) {
+    // Check password
+    const isPasswordValid = await user.comparePassword(password);
+    if (!isPasswordValid) {
       throw new UnauthorizedError('Invalid credentials');
     }
     
-    // Generate tokens (placeholder for now)
-    const accessToken = 'dummy_access_token';
-    const refreshToken = 'dummy_refresh_token';
+    // Generate tokens
+    const tokens = generateTokens(user._id);
+    
+    // Update user's refresh token
+    await UserModel.updateRefreshToken(user._id, tokens.refreshToken);
+    
+    // Remove sensitive data from response
+    const userResponse = user.toObject();
+    delete userResponse.password;
+    delete userResponse.refreshToken;
     
     appResponse(res, {
       message: 'Login successful',
       data: {
-        accessToken,
-        refreshToken
+        user: userResponse,
+        ...tokens
       }
     });
   } catch (error) {
@@ -76,7 +110,7 @@ export const login = (req, res, next) => {
 };
 
 // Refresh token
-export const refreshToken = (req, res, next) => {
+export const refreshToken = async (req, res, next) => {
   try {
     const { refreshToken } = req.body;
     
@@ -84,26 +118,41 @@ export const refreshToken = (req, res, next) => {
       throw new BadRequestError('Refresh token is required');
     }
     
-    // In a real app, you would verify the refresh token
-    // and generate a new access token
+    // Verify refresh token
+    const decoded = jwt.verify(refreshToken, config.JWT_REFRESH_SECRET);
     
-    const newAccessToken = 'new_dummy_access_token';
+    // Find user
+    const user = await UserModel.findById(decoded.id);
+    if (!user || user.refreshToken !== refreshToken) {
+      throw new UnauthorizedError('Invalid refresh token');
+    }
+    
+    // Generate new tokens
+    const tokens = generateTokens(user._id);
+    
+    // Update user's refresh token
+    await UserModel.updateRefreshToken(user._id, tokens.refreshToken);
     
     appResponse(res, {
       message: 'Token refreshed successfully',
-      data: {
-        accessToken: newAccessToken
-      }
+      data: tokens
     });
   } catch (error) {
-    next(error);
+    if (error instanceof jwt.JsonWebTokenError) {
+      next(new UnauthorizedError('Invalid refresh token'));
+    } else {
+      next(error);
+    }
   }
 };
 
 // Logout user
-export const logout = (req, res, next) => {
+export const logout = async (req, res, next) => {
   try {
-    // In a real app, you would invalidate the token
+    const userId = req.user.id;
+    
+    // Clear user's refresh token
+    await UserModel.updateRefreshToken(userId, null);
     
     appResponse(res, {
       message: 'Logged out successfully'
