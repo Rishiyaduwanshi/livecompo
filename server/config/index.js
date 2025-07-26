@@ -1,4 +1,4 @@
-import { AppError } from "..src/utils/appError.js";
+import { AppError } from "../src/utils/appError.js";
 import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -6,7 +6,7 @@ import { dirname, join } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const packageJsonPath = join(__dirname, 'package.json');
+const packageJsonPath = join(__dirname, '../package.json');
 const packageJsonData = readFileSync(packageJsonPath, 'utf-8');
 const { version } = JSON.parse(packageJsonData);
 

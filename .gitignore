@@ -1,0 +1,6 @@
+.github
+node_modules
+demo
+.env
+.env.dev
+logs

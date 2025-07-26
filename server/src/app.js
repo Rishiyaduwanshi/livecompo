@@ -1,6 +1,6 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import { config } from './config/index.js';
+import { config } from '../config/index.js';
 import { AppError } from './utils/appError.js';
 import httpLogger from './utils/appLogger.js';
 import globalErrorHandler from './middlewares/globalError.mid.js';
