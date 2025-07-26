@@ -1,0 +1,24 @@
+{
+  "name": "acciojob",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --env-file=.env.dev server.js",
+    "pro": "node --env-file=.env server.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "dayjs": "^1.11.13",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "morgan": "^1.10.1",
+    "winston": "^3.17.0"
+  }
+}
