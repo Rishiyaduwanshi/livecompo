@@ -4,3 +4,5 @@ demo
 .env
 .env.dev
 logs
+.next
+.trae
