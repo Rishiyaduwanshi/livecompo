@@ -1,22 +1,20 @@
 import { Router } from 'express';
 import {
   generateResponse,
-  getUserSessions,
-  getChatSessionById,
+  getChatSessions,
+  getChatSession,
   deleteChatSession,
-  updateSessionComponent,
+  getProviderInfo,
 } from '../controllers/chat.controller.js';
 import { authenticate } from '../middlewares/auth.mid.js';
 
 const router = Router();
 
-router.use(authenticate);
-router.post('/generate', generateResponse);
-router.get('/sessions', getUserSessions);
-router.get('/sessions/:id', getChatSessionById);
-router.delete('/sessions/:id', deleteChatSession);
-router.put('/sessions/:id/component', updateSessionComponent);
-
-// router.get('/history', getConversationHistory);
+// Chat API routes
+router.use(authenticate)
+router.post('/', generateResponse);
+router.get('/sessions', getChatSessions);
+router.get('/sessions/:sessionId', getChatSession);
+router.delete('/sessions/:sessionId', deleteChatSession);
 
 export default router;

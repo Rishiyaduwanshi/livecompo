@@ -35,13 +35,15 @@ const jwtConfig = {
 const llmConfig = {
     MODEL_PROVIDER: process.env.MODEL_PROVIDER ?? 'ollama',
     
-    // Hugging Face Config
-    HUGGINGFACE_API_KEY: process.env.HUGGINGFACE_API_KEY ?? '',
-    LLM_MODEL: process.env.LLM_MODEL ?? 'microsoft/DialoGPT-medium',
+    // Google Gemini Config (Production)
+    GOOGLE_API_KEY: process.env.GOOGLE_API_KEY ?? '',
+    GEMINI_MODEL: process.env.GEMINI_MODEL ?? 'gemini-1.5-flash',
     
+    // Ollama Config (Development)
     OLLAMA_BASE_URL: process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434',
     OLLAMA_LLM_MODEL: process.env.OLLAMA_LLM_MODEL ?? 'llama3.2:latest',
     
+    // OpenAI Config (Backup)
     OPENAI_API_KEY: process.env.OPENAI_API_KEY ?? '',
     OPENAI_MODEL: process.env.OPENAI_MODEL ?? 'gpt-3.5-turbo',
 };

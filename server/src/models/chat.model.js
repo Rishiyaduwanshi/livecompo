@@ -25,6 +25,18 @@ const componentStateSchema = new mongoose.Schema({
     type: String,
     default: '',
   },
+  description: {
+    type: String,
+    default: '',
+  },
+  features: {
+    type: [String],
+    default: [],
+  },
+  dependencies: {
+    type: [String],
+    default: [],
+  },
   lastModified: {
     type: Date,
     default: Date.now,
@@ -49,7 +61,6 @@ const chatSessionSchema = new mongoose.Schema({
     enum: ['active', 'completed', 'error'],
     default: 'active',
   },
-  // Additional metadata
   messageCount: {
     type: Number,
     default: 0,
