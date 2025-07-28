@@ -2,7 +2,6 @@ import { NotFoundError, BadRequestError } from '../utils/appError.js';
 import appResponse from '../utils/appResponse.js';
 import UserModel from '../models/user.model.js';
 
-// Get user profile
 export const getProfile = (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -12,7 +11,6 @@ export const getProfile = (req, res, next) => {
       throw new NotFoundError('User not found');
     }
     
-    // Remove password from response
     const { password, ...userWithoutPassword } = user;
     
     appResponse(res, {
@@ -24,7 +22,6 @@ export const getProfile = (req, res, next) => {
   }
 };
 
-// Update user profile
 export const updateProfile = (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -41,7 +38,6 @@ export const updateProfile = (req, res, next) => {
     
     const updatedUser = UserModel.update(parseInt(userId), { name, email });
     
-    // Remove password from response
     const { password, ...userWithoutPassword } = updatedUser;
     
     appResponse(res, {
@@ -53,7 +49,6 @@ export const updateProfile = (req, res, next) => {
   }
 };
 
-// Delete user profile
 export const deleteProfile = (req, res, next) => {
   try {
     const userId = req.user.id;

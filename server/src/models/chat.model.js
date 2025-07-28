@@ -1,33 +1,46 @@
+import mongoose from 'mongoose';
 
-class ChatModel {
-  constructor() {
-    this.conversations = {}; 
-  }
+const messageSchema = new mongoose.Schema({
+  role: {
+    type: String,
+    enum: ['user', 'assistant'],
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now,
+  },
+});
 
-  addMessage(userId, message) {
-    if (!this.conversations[userId]) {
-      this.conversations[userId] = [];
-    }
-    
-    const newMessage = {
-      id: this.conversations[userId].length + 1,
-      content: message.content,
-      role: message.role, 
-      timestamp: new Date()
-    };
-    
-    this.conversations[userId].push(newMessage);
-    return newMessage;
-  }
+const chatSessionSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'Session name is required'],
+    trim: true,
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true,
+  },
+  messages: [messageSchema],
+  generatedComponent: {
+    jsx: String,
+    css: String,
+  },
+  status: {
+    type: String,
+    enum: ['active', 'completed', 'error'],
+    default: 'active',
+  },
+}, {
+  timestamps: true,
+});
 
-  getConversationHistory(userId) {
-    return this.conversations[userId] || [];
-  }
+const ChatSession = mongoose.model('ChatSession', chatSessionSchema);
 
-  clearConversationHistory(userId) {
-    this.conversations[userId] = [];
-    return true;
-  }
-}
-
-export default new ChatModel();
+export default ChatSession;

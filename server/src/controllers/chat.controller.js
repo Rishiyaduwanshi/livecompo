@@ -1,57 +1,130 @@
-import { BadRequestError } from '../utils/appError.js';
+import llm from '../services/llm.service.js';
+import ChatSession from '../models/chat.model.js';
+import { AppError } from '../utils/appError.js';
 import appResponse from '../utils/appResponse.js';
-import ChatModel from '../models/chat.model.js';
-import LLMService from '../services/llm.service.js';
 
-// Send a message to the LLM and get a response
-export const sendMessage = async (req, res, next) => {
+// POST /api/chat/generate
+export const generateResponse = async (req, res, next) => {
   try {
-    const { message } = req.body;
-    const userId = req.user.id;
-    
-    if (!message) {
-      throw new BadRequestError('Message is required');
+    const { prompt, isStream = false, sessionId } = req.body;
+    if (!prompt) {
+      return next(
+        new AppError({ message: 'Prompt is required', statusCode: 400 })
+      );
     }
-    
-    // Store user message
-    const userMessage = await ChatModel.addMessage(userId, {
-      content: message,
-      role: 'user'
-    });
-    
-    // Get conversation history
-    const conversationHistory = await ChatModel.getConversationHistory(userId);
-    
-    // Generate response from LLM
-    const llmResponse = await LLMService.generateResponse(message, conversationHistory);
-    
-    // Store assistant response
-    const assistantMessage = await ChatModel.addMessage(userId, llmResponse);
-    
-    appResponse(res, {
-      message: 'Message sent successfully',
-      data: {
-        userMessage,
-        assistantMessage
+
+    let chatSession;
+    if (sessionId) {
+      chatSession = await ChatSession.findById(sessionId);
+      if (!chatSession) {
+        return next(
+          new AppError({ message: 'Session not found', statusCode: 404 })
+        );
       }
-    });
-  } catch (error) {
-    next(error);
+    } else {
+      chatSession = await ChatSession.create({
+        name: prompt.slice(0, 30),
+        user: req.user.id,
+        messages: [],
+      });
+    }
+
+    // Append current user query
+    chatSession.messages.push({ role: 'user', content: prompt });
+
+    const history = chatSession.messages.map((m) => [
+      m.role === 'user' ? 'human' : 'assistant',
+      m.content,
+    ]);
+
+    if (isStream) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.flushHeaders();
+
+      const aiStream = await llm.stream([...history]);
+      for await (const chunk of aiStream) {
+        // chunk.content is standard per API
+        res.write(`data: ${JSON.stringify({ content: chunk.content })}\n\n`);
+      }
+      res.write('event: end\ndata: done\n\n');
+      res.end();
+    } else {
+      const aiMsg = await llm.invoke([...history]);
+      const reply = aiMsg.content || aiMsg;
+
+      chatSession.messages.push({ role: 'assistant', content: reply });
+      await chatSession.save();
+
+      return appResponse(res, {
+        message: 'Response generated',
+        data: { sessionId: chatSession._id, reply },
+      });
+    }
+  } catch (err) {
+    next(err);
   }
 };
 
-// Get conversation history
-export const getConversationHistory = async (req, res, next) => {
+// GET /api/chat/sessions
+export const getUserSessions = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    
-    const history = await ChatModel.getConversationHistory(userId);
-    
-    appResponse(res, {
-      message: 'Conversation history retrieved successfully',
-      data: history
+
+    const sessions = await ChatSession.find({ user: userId })
+      .sort({ updatedAt: -1 })
+      .select('_id name createdAt updatedAt');
+
+    return appResponse(res, {
+      message: 'Chat sessions fetched successfully',
+      data: sessions,
     });
-  } catch (error) {
-    next(error);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getChatSessionById = async (req, res, next) => {
+  
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const session = await ChatSession.findOne({ _id: id, user: userId });
+
+    if (!session) {
+      throw new AppError({
+        message: 'Chat session not found',
+        statusCode: 404,
+      });
+    }
+
+    return appResponse(res, {
+      message: 'Chat session fetched successfully',
+      data: session,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+
+export const deleteChatSession = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { id } = req.params;
+
+    const deleted = await ChatSession.findOneAndDelete({ _id: id, user: userId });
+
+    if (!deleted) {
+      throw new AppError({ message: 'Chat session not found or already deleted', statusCode: 404 });
+    }
+
+    return appResponse(res,{
+      message: 'Chat session deleted successfully',
+    });
+  } catch (err) {
+    next(err);
   }
 };

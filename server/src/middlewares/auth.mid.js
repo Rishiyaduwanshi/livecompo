@@ -1,28 +1,20 @@
+import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../utils/appError.js';
 import { config } from '../../config/index.js';
 
 export const authenticate = (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      throw new UnauthorizedError('Authentication token is missing');
-    }
-    
-    const token = authHeader.split(' ')[1];
-    
+    const token = req.cookies?.accessToken;
+
     if (!token) {
-      throw new UnauthorizedError('Authentication token is invalid');
+      throw new UnauthorizedError('Authentication token missing');
     }
-    
-    req.user = {
-      id: '1',
-      email: 'test@example.com',
-      role: 'user'
-    };
-    
+
+    const decoded = jwt.verify(token, config.JWT_SECRET);
+    req.user = { id: decoded.id };
+
     next();
   } catch (error) {
-    next(error);
+    next(new UnauthorizedError('Invalid or expired token'));
   }
 };
