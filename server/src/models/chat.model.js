@@ -16,6 +16,21 @@ const messageSchema = new mongoose.Schema({
   },
 });
 
+const componentStateSchema = new mongoose.Schema({
+  jsx: {
+    type: String,
+    default: '',
+  },
+  css: {
+    type: String,
+    default: '',
+  },
+  lastModified: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const chatSessionSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -28,17 +43,30 @@ const chatSessionSchema = new mongoose.Schema({
     required: true,
   },
   messages: [messageSchema],
-  generatedComponent: {
-    jsx: String,
-    css: String,
-  },
+  generatedComponent: componentStateSchema,
   status: {
     type: String,
     enum: ['active', 'completed', 'error'],
     default: 'active',
   },
+  // Additional metadata
+  messageCount: {
+    type: Number,
+    default: 0,
+  },
+  lastActivity: {
+    type: Date,
+    default: Date.now,
+  },
 }, {
   timestamps: true,
+});
+
+// Update messageCount and lastActivity before saving
+chatSessionSchema.pre('save', function(next) {
+  this.messageCount = this.messages.length;
+  this.lastActivity = new Date();
+  next();
 });
 
 const ChatSession = mongoose.model('ChatSession', chatSessionSchema);

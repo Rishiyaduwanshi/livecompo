@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors'
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser'
 import { config } from '../config/index.js';
@@ -7,17 +8,24 @@ import httpLogger from './utils/appLogger.js';
 import globalErrorHandler from './middlewares/globalError.mid.js';
 
 const app = express();
-
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(cookieParser())
 app.use(httpLogger);
 app.use(rateLimit(config.GLOBAL_RATE_LIMIT_CONFIG));
 app.use(rateLimit(config.PER_IP_RATE_LIMIT_CONFIG));
 app.use(express.json());
 
+// Additional CORS middleware for preflight requests
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Origin', req.headers.origin || 'http://localhost:3000');
     res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
     
     if (req.method === 'OPTIONS') {
         res.sendStatus(200);

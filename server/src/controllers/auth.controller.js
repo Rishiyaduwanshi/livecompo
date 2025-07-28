@@ -23,8 +23,8 @@ export const register = async (req, res, next) => {
   try {
     const { email, password, name } = req.body;
 
-    if (!email || !password || !name) {
-      throw new BadRequestError('Email, password and name are required');
+    if (!email || !password) {
+      throw new BadRequestError('Email and password are required');
     }
 
     const existingUser = await UserModel.findOne({ email });
@@ -32,7 +32,10 @@ export const register = async (req, res, next) => {
       throw new BadRequestError('User with this email already exists');
     }
 
-    const user = await UserModel.create({ email, password, name });
+    // Use email as default name if name is not provided
+    const userName = name || email.split('@')[0];
+
+    const user = await UserModel.create({ email, password, name: userName });
     const tokens = generateTokens(user._id);
     await UserModel.updateRefreshToken(user._id, tokens.refreshToken);
 
@@ -45,7 +48,7 @@ export const register = async (req, res, next) => {
     appResponse(res, {
       statusCode: 201,
       message: 'User registered successfully',
-      data: { user: userResponse },
+      data: { user: userResponse, token: tokens.accessToken },
     });
   } catch (error) {
     next(error);
@@ -77,7 +80,7 @@ export const login = async (req, res, next) => {
 
     appResponse(res, {
       message: 'Login successful',
-      data: { user: userResponse },
+      data: { user: userResponse, token: tokens.accessToken },
     });
   } catch (error) {
     next(error);
