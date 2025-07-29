@@ -1,6 +1,7 @@
 import { HumanMessage, AIMessage } from '@langchain/core/messages';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import llm from './llm.service.js';
+import { AppError } from '../utils/appError.js';
 
 class OllamaCompatibleLLMService {
   constructor() {
@@ -24,7 +25,7 @@ class OllamaCompatibleLLMService {
       };
     } catch (error) {
       console.error('Ollama LLM error:', error);
-      throw new Error(`Failed to generate component: ${error.message}`);
+      throw new AppError({message: `Failed to generate component: ${error.message}`});
     }
   }
 
