@@ -33,11 +33,14 @@ export const generateResponse = async (req, res, next) => {
       });
     }
 
+    // Add user message to conversation history
     chatSession.messages.push({
       role: 'user',
       content: prompt,
       timestamp: new Date(),
     });
+
+    console.log(`Processing chat request - Session: ${chatSession._id}, Messages: ${chatSession.messages.length}, User: ${req.user?.id}`);
 
     let result;
 
@@ -45,9 +48,10 @@ export const generateResponse = async (req, res, next) => {
       const { default: geminiService } = await import(
         '../services/gemini-llm.service.js'
       );
+      // Pass conversation history (excluding current user message) for context
       result = await geminiService.handleRequest(
         prompt,
-        chatSession.messages.slice(0, -1),
+        chatSession.messages.slice(0, -1), // Previous messages for context
         chatSession.generatedComponent
       );
     } else if (config.MODEL_PROVIDER === 'ollama') {
@@ -75,17 +79,22 @@ export const generateResponse = async (req, res, next) => {
       );
     }
 
-    
+    // Extract response data from result
     const responseData = result.data;
 
-    
+    // Add AI assistant response to conversation history
     chatSession.messages.push({
       role: 'assistant',
-      content: responseData.message || 'Component generated successfully',
+      content: responseData.message || responseData.component?.description || 'Component generated successfully',
       timestamp: new Date(),
+      metadata: {
+        componentGenerated: responseData.type === 'component',
+        componentName: responseData.component?.componentName,
+        hasCode: !!(responseData.component?.jsx && responseData.component?.css)
+      }
     });
 
-    
+    // Update generated component if provided
     if (responseData.type === 'component' && responseData.component) {
       chatSession.generatedComponent = {
         jsx: responseData.component.jsx || '',
@@ -95,24 +104,33 @@ export const generateResponse = async (req, res, next) => {
         dependencies: responseData.component.dependencies || [],
         props: responseData.component.props || [],
         accessibility: responseData.component.accessibility || {},
-        componentName:
-          responseData.component.componentName || 'GeneratedComponent',
-        lastModified: responseData.component.lastModified || new Date(),
+        componentName: responseData.component.componentName || 'GeneratedComponent',
+        lastModified: new Date(),
       };
+      
+      console.log(`Component updated - Name: ${chatSession.generatedComponent.componentName}, JSX length: ${chatSession.generatedComponent.jsx.length}`);
     }
 
+    // Save updated session to database
     await chatSession.save();
 
-    
+    // Return comprehensive response with chat history
     return appResponse(res, {
       statusCode: 200,
       success: true,
       message: 'Response generated successfully',
       data: {
         sessionId: chatSession._id,
+        reply: responseData.message || responseData.component?.description || 'Component generated successfully',
         component: chatSession.generatedComponent,
         type: responseData.type,
-        metadata: responseData.metadata,
+        metadata: {
+          ...responseData.metadata,
+          messageCount: chatSession.messages.length,
+          conversationActive: true,
+          lastActivity: new Date().toISOString()
+        },
+        conversationHistory: chatSession.messages.slice(-10), // Last 10 messages for context
       },
     });
   } catch (error) {
@@ -209,43 +227,3 @@ export const deleteChatSession = async (req, res, next) => {
 };
 
 
-export const getProviderInfo = async (req, res, next) => {
-  try {
-    const providerInfo = {
-      provider: config.MODEL_PROVIDER,
-      supportsStructuredOutput:
-        config.MODEL_PROVIDER === 'gemini' ||
-        config.MODEL_PROVIDER === 'openai',
-      status: 'active',
-      recommendedFor: getRecommendation(config.MODEL_PROVIDER),
-    };
-
-    return appResponse(res, {
-      statusCode: 200,
-      success: true,
-      message: 'Provider info retrieved successfully',
-      data: providerInfo,
-    });
-  } catch (error) {
-    console.error('Get provider info error:', error);
-    return next(
-      new AppError({
-        message: `Failed to get provider info: ${error.message}`,
-        statusCode: 500,
-      })
-    );
-  }
-};
-
-function getRecommendation(provider) {
-  switch (provider) {
-    case 'gemini':
-      return 'Excellent for production - structured output, fast responses';
-    case 'ollama':
-      return 'Perfect for development - local, private, customizable';
-    case 'openai':
-      return 'Best for complex features - advanced capabilities';
-    default:
-      return 'Standard LLM capabilities';
-  }
-}

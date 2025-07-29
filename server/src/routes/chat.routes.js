@@ -4,7 +4,6 @@ import {
   getChatSessions,
   getChatSession,
   deleteChatSession,
-  getProviderInfo,
 } from '../controllers/chat.controller.js';
 import { authenticate } from '../middlewares/auth.mid.js';
 

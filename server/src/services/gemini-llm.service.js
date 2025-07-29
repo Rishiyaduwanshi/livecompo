@@ -31,18 +31,44 @@ class GeminiLLMService {
 
   async handleRequest(userInput, chatHistory = [], currentComponent = null) {
     try {
-      console.log('Gemini LLM: Processing request:', userInput);
+      console.log('Gemini LLM: Processing request:', { 
+        userInput, 
+        historyLength: chatHistory.length,
+        hasCurrentComponent: !!currentComponent 
+      });
       
-      // Create enhanced prompt for better component generation
-      const enhancedPrompt = `
-You are an expert React developer. Create a complete, functional React component based on this request: "${userInput}"
+      // Build conversation context from chat history
+      let conversationContext = '';
+      if (chatHistory.length > 0) {
+        conversationContext = '\nPrevious conversation:\n';
+        chatHistory.slice(-5).forEach((msg, index) => {
+          conversationContext += `${msg.role}: ${msg.content}\n`;
+        });
+        conversationContext += '\n';
+      }
+      
+      // Add current component context if exists
+      let componentContext = '';
+      if (currentComponent && currentComponent.jsx) {
+        componentContext = `\nCurrent component context:
+Component Name: ${currentComponent.componentName || 'Unknown'}
+Description: ${currentComponent.description || 'No description'}
+Current JSX: ${currentComponent.jsx.substring(0, 300)}...
+\n`;
+      }
+      
+      // Create enhanced prompt with conversation history
+      const enhancedPrompt = `You are an expert React developer. Based on the conversation history and current context, respond to this request: "${userInput}"
+
+${conversationContext}${componentContext}
 
 Requirements:
 1. Generate clean, modern JSX code with proper React hooks
-2. Include beautiful, responsive CSS with modern design principles
+2. Include beautiful, responsive CSS with modern design principles  
 3. Use semantic HTML elements and proper accessibility
 4. Add interactive features where appropriate
 5. Follow React best practices
+6. Consider the conversation history and modify/enhance existing component if needed
 
 Component should be:
 - Functional and ready to use
