@@ -18,7 +18,8 @@ const ChatPanel = ({ collapsed, onToggle }) => {
     currentSession, 
     chatMessages, 
     isLoading, 
-    sendMessage
+    sendMessage,
+    clearSession
   } = useSessionStore();
 
   const [inputValue, setInputValue] = useState('');
@@ -61,9 +62,16 @@ const ChatPanel = ({ collapsed, onToggle }) => {
         </button>
         
         <div className="mt-4">
-          <div className="p-2 text-gray-400" title="AI Chat">
+          <button
+            onClick={() => {
+              clearSession();
+              onToggle();
+            }}
+            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            title="Start New Chat"
+          >
             <Bot className="h-5 w-5" />
-          </div>
+          </button>
         </div>
       </div>
     );

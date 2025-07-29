@@ -28,16 +28,15 @@ const Header = ({
     autoSave, 
     toggleAutoSave, 
     lastSaved,
-    saveSession 
+    saveSession,
+    clearSession 
   } = useSessionStore();
   
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [isCreatingSession, setIsCreatingSession] = useState(false);
 
-  const handleCreateSession = async () => {
-    setIsCreatingSession(true);
-    await createSession();
-    setIsCreatingSession(false);
+  const handleNewChat = () => {
+    // Clear current session and start fresh
+    clearSession();
   };
 
   const handleManualSave = async () => {
@@ -92,14 +91,13 @@ const Header = ({
 
         {/* Center Section - Actions */}
         <div className="flex items-center space-x-3">
-          {/* New Session Button */}
+          {/* New Chat Button */}
           <button
-            onClick={handleCreateSession}
-            disabled={isCreatingSession}
-            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-md transition-colors"
+            onClick={handleNewChat}
+            className="flex items-center space-x-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition-colors"
           >
             <Plus className="h-4 w-4" />
-            <span>{isCreatingSession ? 'Creating...' : 'New Session'}</span>
+            <span>New Chat</span>
           </button>
 
           {/* Auto-save Toggle */}
