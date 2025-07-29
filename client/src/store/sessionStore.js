@@ -74,12 +74,21 @@ const useSessionStore = create(
       },
 
       loadSession: async (sessionId) => {
+        console.log('sessionStore: loadSession called with ID:', sessionId);
         set({ isLoading: true, error: null });
         try {
+          console.log('sessionStore: Making API call to load session');
           const response = await axios.get(`${API_BASE_URL}/chat/sessions/${sessionId}`, {
             withCredentials: true
           });
           const session = response.data.data;
+          
+          console.log('sessionStore: Session loaded successfully', {
+            sessionId: session._id,
+            name: session.name,
+            messagesCount: session.messages?.length,
+            hasComponent: !!session.generatedComponent
+          });
 
           set({
             currentSession: session,
@@ -94,6 +103,11 @@ const useSessionStore = create(
 
           return { success: true };
         } catch (error) {
+          console.error('sessionStore: loadSession error:', {
+            status: error.response?.status,
+            message: error.response?.data?.message,
+            sessionId
+          });
           const errorMessage = error.response?.data?.message || 'Failed to load session';
           set({ isLoading: false, error: errorMessage });
           return { success: false, error: errorMessage };

@@ -38,8 +38,29 @@ const Sidebar = ({ collapsed, onToggle }) => {
   });
 
   const handleSessionClick = async (sessionId) => {
-    if (currentSession?._id !== sessionId) {
-      await loadSession(sessionId);
+    const { chatMessages } = useSessionStore.getState();
+    const hasMessages = chatMessages && chatMessages.length > 0;
+    
+    console.log('Sidebar: Session clicked', {
+      sessionId,
+      currentSessionId: currentSession?._id,
+      hasMessages,
+      messagesCount: chatMessages?.length || 0,
+      shouldLoad: currentSession?._id !== sessionId || !hasMessages
+    });
+    
+    if (currentSession?._id !== sessionId || !hasMessages) {
+      console.log('Sidebar: Loading session...', {
+        reason: currentSession?._id !== sessionId ? 'different session' : 'no messages loaded'
+      });
+      try {
+        const result = await loadSession(sessionId);
+        console.log('Sidebar: Load session result:', result);
+      } catch (error) {
+        console.error('Sidebar: Load session error:', error);
+      }
+    } else {
+      console.log('Sidebar: Session already active and loaded');
     }
   };
 
