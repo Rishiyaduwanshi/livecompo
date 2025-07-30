@@ -17,15 +17,18 @@ const CodePreview = ({ jsx = '', css = '' }) => {
   const { selectElement } = useSessionStore();
 
   const componentCode = useMemo(() => {
-    return jsx.includes('export default')
-      ? jsx
-      : `${jsx}\n\nexport default ${detectComponentName(jsx)};`;
+    let code = jsx || '';
+    // Replace any import './*.css' with import './App.css'
+    code = code.replace(/import\s+['\"]\.\/[\w-]+\.css['\"];?/g, "import './App.css';");
+    // Ensure export default is present
+    if (!code.includes('export default')) {
+      code += `\n\nexport default ${detectComponentName(code)};`;
+    }
+    return code;
   }, [jsx]);
   
 
   
-  console.log("css CODE-------------------->", css)
-
   const files = {
     '/App.js': componentCode,
     '/App.css': css,
