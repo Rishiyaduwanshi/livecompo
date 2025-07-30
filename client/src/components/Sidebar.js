@@ -84,70 +84,65 @@ const Sidebar = ({ collapsed, onToggle }) => {
 
   if (collapsed) {
     return (
-      <div className="w-16 bg-white border-r border-gray-200 flex flex-col items-center py-4">
+      <div className="w-14 bg-white border-r border-gray-200 flex flex-col items-center py-2">
         <button
           onClick={onToggle}
-          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
           title="Expand sidebar"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
-        
-        <div className="mt-4 space-y-2">
-          <div className="p-2 text-gray-400" title="Chat Sessions">
-            <MessageSquare className="h-5 w-5" />
-          </div>
+        <div className="mt-2">
+          <MessageSquare className="h-5 w-5 text-gray-300" title="Chat Sessions" />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
+    <div className="w-64 bg-white border-r border-gray-200 flex flex-col h-full">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <MessageSquare className="h-5 w-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Chat Sessions</h2>
+      <div className="p-2 border-b border-gray-200">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-1">
+            <MessageSquare className="h-4 w-4 text-blue-600" />
+            <h2 className="text-base font-semibold text-gray-900">Chats</h2>
           </div>
           <button
             onClick={onToggle}
-            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
             title="Collapse sidebar"
           >
             <ChevronLeft className="h-4 w-4" />
           </button>
         </div>
-
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400" />
           <input
             type="text"
-            placeholder="Search sessions..."
+            placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-full pl-8 pr-2 py-1 border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 text-xs"
           />
         </div>
       </div>
-
       {/* Sessions List */}
       <div className="flex-1 overflow-y-auto">
         {filteredSessions.length === 0 ? (
-          <div className="p-4 text-center">
+          <div className="p-2 text-center">
             {searchTerm ? (
               <div className="text-gray-500">
-                <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No sessions found</p>
-                <p className="text-xs text-gray-400 mt-1">Try a different search term</p>
+                <Search className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                <p className="text-xs">No sessions found</p>
+                <p className="text-[10px] text-gray-400 mt-1">Try a different search</p>
               </div>
             ) : (
               <div className="text-gray-500">
-                <MessageSquare className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p className="text-sm">No sessions yet</p>
-                <p className="text-xs text-gray-400 mt-1">Start chatting with AI to create your first session</p>
+                <MessageSquare className="h-6 w-6 mx-auto mb-1 opacity-50" />
+                <p className="text-xs">No sessions yet</p>
+                <p className="text-[10px] text-gray-400 mt-1">Start chatting to create your first session</p>
               </div>
             )}
           </div>
@@ -157,28 +152,27 @@ const Sidebar = ({ collapsed, onToggle }) => {
               <div
                 key={session._id}
                 onClick={() => handleSessionClick(session._id)}
-                className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors ${
+                className={`px-3 py-2 cursor-pointer hover:bg-blue-50 transition-colors text-xs ${
                   currentSession?._id === session._id 
-                    ? 'bg-blue-50 border-r-2 border-blue-500' 
+                    ? 'bg-blue-100 border-r-2 border-blue-500' 
                     : ''
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                    <h3 className="text-xs font-medium text-gray-900 truncate">
                       {session.name}
                     </h3>
-                    <div className="flex items-center space-x-2 mt-1">
+                    <div className="flex items-center space-x-1 mt-0.5">
                       <Clock className="h-3 w-3 text-gray-400" />
-                      <span className="text-xs text-gray-500">
+                      <span className="text-[10px] text-gray-500">
                         {formatDate(session.createdAt)}
                       </span>
                     </div>
                   </div>
-                  
                   <button
                     onClick={(e) => handleDeleteSession(e, session._id)}
-                    className="ml-2 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                    className="ml-1 p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                     title="Delete session"
                   >
                     <Trash2 className="h-3 w-3" />

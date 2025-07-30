@@ -176,86 +176,81 @@ const PropertyEditor = () => {
   return (
     <div className="h-full flex flex-col bg-white">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200">
+      <div className="p-2 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-medium text-gray-900">Element Properties</h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <h3 className="text-base font-semibold text-gray-900">Element Properties</h3>
+            <p className="text-xs text-gray-500 mt-0.5">
               {selectedElement.tagName.toLowerCase()}
               {selectedElement.className && `.${selectedElement.className}`}
             </p>
           </div>
           <button
             onClick={closePropertyPanel}
-            className="p-1 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       </div>
-
       {/* Properties */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-6">
+      <div className="flex-1 overflow-y-auto p-2 space-y-4">
         {/* Colors */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-1">
             <Palette className="h-4 w-4 text-gray-600" />
-            <h4 className="text-sm font-medium text-gray-900">Colors</h4>
+            <h4 className="text-xs font-medium text-gray-900">Colors</h4>
           </div>
-          
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Background
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <input
                   type="color"
                   value={properties.backgroundColor}
                   onChange={(e) => handlePropertyChange('backgroundColor', e.target.value)}
-                  className="w-8 h-8 rounded border border-gray-300"
+                  className="w-6 h-6 rounded border border-gray-300"
                 />
                 <input
                   type="text"
                   value={properties.backgroundColor}
                   onChange={(e) => handlePropertyChange('backgroundColor', e.target.value)}
-                  className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-1 py-0.5 text-[10px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Text Color
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <input
                   type="color"
                   value={properties.color}
                   onChange={(e) => handlePropertyChange('color', e.target.value)}
-                  className="w-8 h-8 rounded border border-gray-300"
+                  className="w-6 h-6 rounded border border-gray-300"
                 />
                 <input
                   type="text"
                   value={properties.color}
                   onChange={(e) => handlePropertyChange('color', e.target.value)}
-                  className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-1 py-0.5 text-[10px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
           </div>
         </div>
-
         {/* Typography */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-1">
             <Type className="h-4 w-4 text-gray-600" />
-            <h4 className="text-sm font-medium text-gray-900">Typography</h4>
+            <h4 className="text-xs font-medium text-gray-900">Typography</h4>
           </div>
-
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Font Size ({properties.fontSize}px)
               </label>
               <input
@@ -267,15 +262,14 @@ const PropertyEditor = () => {
                 className="w-full"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Font Weight
               </label>
               <select
                 value={properties.fontWeight}
                 onChange={(e) => handlePropertyChange('fontWeight', e.target.value)}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option value="normal">Normal</option>
                 <option value="bold">Bold</option>
@@ -287,15 +281,14 @@ const PropertyEditor = () => {
                 <option value="900">900</option>
               </select>
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Text Align
               </label>
               <select
                 value={properties.textAlign}
                 onChange={(e) => handlePropertyChange('textAlign', e.target.value)}
-                className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-1 py-0.5 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
               >
                 <option value="left">Left</option>
                 <option value="center">Center</option>
@@ -305,17 +298,15 @@ const PropertyEditor = () => {
             </div>
           </div>
         </div>
-
         {/* Spacing */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-1">
             <Move className="h-4 w-4 text-gray-600" />
-            <h4 className="text-sm font-medium text-gray-900">Spacing</h4>
+            <h4 className="text-xs font-medium text-gray-900">Spacing</h4>
           </div>
-
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Padding ({properties.padding}px)
               </label>
               <input
@@ -327,9 +318,8 @@ const PropertyEditor = () => {
                 className="w-full"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Margin ({properties.margin}px)
               </label>
               <input
@@ -343,17 +333,15 @@ const PropertyEditor = () => {
             </div>
           </div>
         </div>
-
         {/* Border */}
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-1">
             <Square className="h-4 w-4 text-gray-600" />
-            <h4 className="text-sm font-medium text-gray-900">Border</h4>
+            <h4 className="text-xs font-medium text-gray-900">Border</h4>
           </div>
-
-          <div className="space-y-3">
+          <div className="space-y-2">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Border Radius ({properties.borderRadius}px)
               </label>
               <input
@@ -365,9 +353,8 @@ const PropertyEditor = () => {
                 className="w-full"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Border Width ({properties.borderWidth}px)
               </label>
               <input
@@ -379,39 +366,36 @@ const PropertyEditor = () => {
                 className="w-full"
               />
             </div>
-
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">
+              <label className="block text-[10px] font-medium text-gray-700 mb-1">
                 Border Color
               </label>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-center space-x-1">
                 <input
                   type="color"
                   value={properties.borderColor}
                   onChange={(e) => handlePropertyChange('borderColor', e.target.value)}
-                  className="w-8 h-8 rounded border border-gray-300"
+                  className="w-6 h-6 rounded border border-gray-300"
                 />
                 <input
                   type="text"
                   value={properties.borderColor}
                   onChange={(e) => handlePropertyChange('borderColor', e.target.value)}
-                  className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="flex-1 px-1 py-0.5 text-[10px] border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>
           </div>
         </div>
       </div>
-
       {/* AI Chat for Element */}
-      <div className="border-t border-gray-200 p-4">
-        <div className="space-y-3">
-          <div className="flex items-center space-x-2">
+      <div className="border-t border-gray-200 p-2">
+        <div className="space-y-2">
+          <div className="flex items-center space-x-1">
             <Sliders className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium text-gray-900">AI Modifications</span>
+            <span className="text-xs font-medium text-gray-900">AI Modifications</span>
           </div>
-          
-          <div className="flex space-x-2">
+          <div className="flex space-x-1">
             <input
               type="text"
               value={chatPrompt}
@@ -422,18 +406,17 @@ const PropertyEditor = () => {
                 }
               }}
               placeholder="Modify this element..."
-              className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="flex-1 px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
             <button
               onClick={handleChatSubmit}
               disabled={!chatPrompt.trim()}
-              className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm rounded-md transition-colors"
+              className="px-2 py-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs rounded transition-colors"
             >
               <Send className="h-4 w-4" />
             </button>
           </div>
-          
-          <p className="text-xs text-gray-500">
+          <p className="text-[10px] text-gray-500">
             Example: "Make this button larger with a blue gradient"
           </p>
         </div>

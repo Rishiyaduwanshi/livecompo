@@ -14,7 +14,6 @@ const detectComponentName = (code) => {
 
 const CodePreview = ({ jsx = '', css = '' }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showGrid, setShowGrid] = useState(true);
   const [copyType, setCopyType] = useState(null);
   // Export/copy handlers
   const handleCopy = async (type) => {
@@ -70,7 +69,6 @@ const CodePreview = ({ jsx = '', css = '' }) => {
   };
 
   const refreshPreview = () => {
-    // In real scenario, you might re-trigger state or rerender
   };
 
   const EmptyComponent = () => (
@@ -84,65 +82,58 @@ const CodePreview = ({ jsx = '', css = '' }) => {
   );
 
   const PreviewControls = () => (
-    <div className="flex items-center justify-end px-2 py-1 bg-white border-b border-gray-100">
-      <div className="flex items-center space-x-1">
-        <button
-          onClick={refreshPreview}
-          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-          title="Refresh preview"
-        >
-          <RefreshCw className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => setIsFullscreen(!isFullscreen)}
-          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-          title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-        >
-          <Maximize2 className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => handleCopy('jsx')}
-          className={`p-2 rounded-md transition-colors ${copyType==='jsx' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
-          title="Copy JSX"
-        >
-          <Copy className="h-4 w-4" />
-        </button>
-        <button
-          onClick={() => handleCopy('css')}
-          className={`p-2 rounded-md transition-colors ${copyType==='css' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`}
-          title="Copy CSS"
-        >
-          <Copy className="h-4 w-4" />
-        </button>
-        <button
-          onClick={handleDownload}
-          className="p-2 rounded-md transition-colors text-gray-500 hover:text-gray-700 hover:bg-gray-100"
-          title="Download ZIP"
-        >
-          <Download className="h-4 w-4" />
-        </button>
-      </div>
+    <div className="absolute top-3 right-4 z-20 flex items-center space-x-1 bg-white/80 backdrop-blur-sm rounded-lg shadow px-1 py-1 border border-gray-200">
+      <button
+        onClick={refreshPreview}
+        className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+        title="Refresh preview"
+      >
+        <RefreshCw className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => setIsFullscreen(!isFullscreen)}
+        className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+        title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+      >
+        <Maximize2 className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => handleCopy('jsx')}
+        className={`p-1 rounded transition-colors ${copyType==='jsx' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'}`}
+        title="Copy JSX"
+      >
+        <Copy className="h-4 w-4" />
+      </button>
+      <button
+        onClick={() => handleCopy('css')}
+        className={`p-1 rounded transition-colors ${copyType==='css' ? 'bg-green-100 text-green-700' : 'text-gray-500 hover:text-blue-600 hover:bg-blue-50'}`}
+        title="Copy CSS"
+      >
+        <Copy className="h-4 w-4" />
+      </button>
+      <button
+        onClick={handleDownload}
+        className="p-1 rounded transition-colors text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+        title="Download ZIP"
+      >
+        <Download className="h-4 w-4" />
+      </button>
     </div>
   );
 
   return (
     <div className={`flex flex-col h-full ${isFullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}>
-      <PreviewControls />
-      <div className={`flex-1 relative ${isFullscreen ? 'bg-white' : ''}`}
-        style={isFullscreen ? {padding: 0, margin: 0} : {}}>
+      <div className={`flex-1 relative ${isFullscreen ? 'bg-white' : ''}`} style={isFullscreen ? {padding: 0, margin: 0} : {}}>
         {!jsx.trim() ? (
-          <div className="p-8">
+          <div className="p-4 md:p-6">
             <EmptyComponent />
           </div>
         ) : (
-          <div
-            className={`flex-1 p-0 md:p-0 overflow-auto bg-white`}
-            style={{
-              minHeight: isFullscreen ? '100vh' : 320,
-            }}
-          >
-            <div className={`${isFullscreen ? 'w-full h-[calc(100vh-48px)]' : 'max-w-3xl'} mx-auto rounded-2xl shadow-lg border border-gray-100 bg-white`} style={isFullscreen ? {height: 'calc(100vh - 48px)', maxWidth: '100vw'} : {}}>
-              <Sandpack
+          <div className="flex-1 overflow-auto bg-white relative ">
+            <div className={`mx-auto rounded-xl shadow relative h-500 ${isFullscreen ? 'h-[calc(100vh-32px)]' : 'max-w-7xl'}`}
+            >
+              <PreviewControls />
+              <Sandpack 
                 template="react"
                 files={files}
                 options={{
@@ -151,7 +142,7 @@ const CodePreview = ({ jsx = '', css = '' }) => {
                   showLineNumbers: true,
                   showInlineErrors: true,
                   wrapContent: true,
-                  editorHeight: isFullscreen ? 'calc(100vh - 80px)' : 340,
+                  editorHeight: isFullscreen ? 'calc(100vh - 80px)' : "calc(100vh - 20vh)",
                   editorWidthPercentage: 50,
                 }}
                 customSetup={{
@@ -166,7 +157,6 @@ const CodePreview = ({ jsx = '', css = '' }) => {
         )}
       </div>
       {css && <style dangerouslySetInnerHTML={{ __html: css }} />}
-      {/* Removed bottom bar for a cleaner, more compact UI */}
     </div>
   );
 };
