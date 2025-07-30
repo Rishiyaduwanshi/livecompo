@@ -78,7 +78,7 @@ const ChatPanel = ({ collapsed, onToggle }) => {
   }
 
   return (
-    <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-full">
+    <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full">
       {/* Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex items-center justify-between">
@@ -188,7 +188,7 @@ const ChatPanel = ({ collapsed, onToggle }) => {
           <div className="flex space-x-2">
             {/* Text Input */}
             <div className="flex-1">
-              <textarea
+            <textarea
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => {
@@ -198,7 +198,7 @@ const ChatPanel = ({ collapsed, onToggle }) => {
                   }
                 }}
                 placeholder="Describe the React component you want to create..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50 text-gray-900 placeholder-gray-400"
                 rows={3}
                 disabled={isLoading}
               />
@@ -208,7 +208,10 @@ const ChatPanel = ({ collapsed, onToggle }) => {
             <button
               type="submit"
               disabled={!inputValue.trim() || isLoading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
+              className={`px-4 py-2 rounded-md flex items-center space-x-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+                ${!inputValue.trim() || isLoading
+                  ? 'bg-blue-200 text-white cursor-not-allowed'
+                  : 'bg-blue-600 text-white hover:bg-blue-700'}`}
             >
               {isLoading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
